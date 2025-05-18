@@ -19,12 +19,12 @@ def weather(city):
     if not api_key:
         return jsonify({"error": "No API key set"}), 500
 
-    url = f"http://api.openweathermap.org/data/2.5/weather?q={city},LK&appid={api_key}&units=metric"
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
     response = requests.get(url)
-    
+
     if response.status_code != 200:
         return jsonify({"error": "Failed to fetch weather data"}), response.status_code
-    
+
     data = response.json()
 
     pretty_data = {
@@ -33,7 +33,7 @@ def weather(city):
         "temperature_celsius": data.get("main", {}).get("temp"),
         "feels_like_celsius": data.get("main", {}).get("feels_like"),
         "humidity_percent": data.get("main", {}).get("humidity"),
-        "weather_description": data.get("weather", [{}])[0].get("description"),
+        "weather_description": data.get("weather", [{}])[0].get("description").capitalize(),
         "wind_speed_mps": data.get("wind", {}).get("speed"),
         "cloud_coverage_percent": data.get("clouds", {}).get("all")
     }
