@@ -1,123 +1,154 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Sri Lanka Weather</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-            min-height: 100vh;
-            margin: 0;
-        }
-        h1 {
-            margin-bottom: 1rem;
-            color: #fff;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
-        }
-        input, button {
-            padding: 0.5rem 1rem;
-            font-size: 1rem;
-            border-radius: 5px;
-            border: none;
-            margin: 0.5rem;
-            outline: none;
-        }
-        input {
-            width: 250px;
-            max-width: 80vw;
-        }
-        button {
-            background-color: #5C6BC0;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #3949AB;
-        }
-        .weather-card {
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            padding: 2rem;
-            margin-top: 2rem;
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-        .error {
-            color: #b00020;
-            margin-top: 1rem;
-            font-weight: bold;
-        }
-        .loading {
-            margin-top: 1rem;
-            font-style: italic;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Global Weather App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+    }
+
+    .container {
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #fff;
+      margin-bottom: 1.5rem;
+    }
+
+    .search-box {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 2rem;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      width: 60%;
+      outline: none;
+    }
+
+    button {
+      background-color: #fff;
+      color: #0077ff;
+      font-weight: bold;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #eaeaea;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 2rem;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      transition: 0.3s;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+
+    .card p {
+      margin: 0.3rem 0;
+      font-size: 1rem;
+    }
+
+    .error {
+      color: #ffcccc;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    @media screen and (max-width: 600px) {
+      input {
+        width: 100%;
+      }
+
+      .search-box {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Sri Lanka Real-Time Weather</h1>
-
-    <div>
-        <input type="text" id="city-input" placeholder="Enter city (e.g., Colombo)" />
-        <button id="fetch-btn">Get Weather</button>
+  <div class="container">
+    <h1>🌍 Check Weather Anywhere</h1>
+    <div class="search-box">
+      <input type="text" id="city-input" placeholder="e.g. New York, Tokyo, Colombo" />
+      <button onclick="getWeather()">Search</button>
     </div>
-
     <div id="result"></div>
+  </div>
 
-    <script>
-        const fetchBtn = document.getElementById('fetch-btn');
-        const cityInput = document.getElementById('city-input');
-        const resultDiv = document.getElementById('result');
+  <script>
+    function getWeather() {
+      const city = document.getElementById("city-input").value.trim();
+      const result = document.getElementById("result");
+      if (!city) {
+        result.innerHTML = '<p class="error">Please enter a city name.</p>';
+        return;
+      }
 
-        fetchBtn.addEventListener('click', () => {
-            const city = cityInput.value.trim();
-            if (!city) {
-                resultDiv.innerHTML = '<p class="error">Please enter a city name.</p>';
-                return;
-            }
+      result.innerHTML = '<p style="color:white;">Fetching weather data...</p>';
 
-            resultDiv.innerHTML = '<p class="loading">Loading...</p>';
-
-            fetch(`/weather/${encodeURIComponent(city)}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) {
-                        resultDiv.innerHTML = `<p class="error">${data.error}</p>`;
-                        return;
-                    }
-
-                    resultDiv.innerHTML = `
-                        <div class="weather-card">
-                            <h2>${data.city}, ${data.country}</h2>
-                            <p><strong>Temperature:</strong> ${data.temperature_celsius} °C</p>
-                            <p><strong>Feels Like:</strong> ${data.feels_like_celsius} °C</p>
-                            <p><strong>Humidity:</strong> ${data.humidity_percent} %</p>
-                            <p><strong>Weather:</strong> ${data.weather_description}</p>
-                            <p><strong>Wind Speed:</strong> ${data.wind_speed_mps} m/s</p>
-                            <p><strong>Cloud Coverage:</strong> ${data.cloud_coverage_percent} %</p>
-                        </div>
-                    `;
-                })
-                .catch(() => {
-                    resultDiv.innerHTML = '<p class="error">Failed to fetch weather data. Try again later.</p>';
-                });
+      fetch(`/weather/${encodeURIComponent(city)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            result.innerHTML = `<p class="error">${data.error}</p>`;
+          } else {
+            result.innerHTML = `
+              <div class="card">
+                <h2>${data.city}, ${data.country}</h2>
+                <p>🌡️ <strong>Temperature:</strong> ${data.temperature_celsius}°C</p>
+                <p>🥵 <strong>Feels Like:</strong> ${data.feels_like_celsius}°C</p>
+                <p>💧 <strong>Humidity:</strong> ${data.humidity_percent}%</p>
+                <p>☁️ <strong>Condition:</strong> ${data.weather_description}</p>
+                <p>💨 <strong>Wind Speed:</strong> ${data.wind_speed_mps} m/s</p>
+                <p>🌥️ <strong>Cloud Cover:</strong> ${data.cloud_coverage_percent}%</p>
+              </div>
+            `;
+          }
+        })
+        .catch(() => {
+          result.innerHTML = '<p class="error">Something went wrong. Try again.</p>';
         });
-
-        // Optional: Press Enter key triggers fetch
-        cityInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                fetchBtn.click();
-            }
-        });
-    </script>
+    }
+  </script>
 </body>
 </html>
