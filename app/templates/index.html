@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sri Lanka Weather</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 1rem;
+            color: #fff;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+        }
+        input, button {
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: none;
+            margin: 0.5rem;
+            outline: none;
+        }
+        input {
+            width: 250px;
+            max-width: 80vw;
+        }
+        button {
+            background-color: #5C6BC0;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #3949AB;
+        }
+        .weather-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            padding: 2rem;
+            margin-top: 2rem;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        .error {
+            color: #b00020;
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+        .loading {
+            margin-top: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sri Lanka Real-Time Weather</h1>
+
+    <div>
+        <input type="text" id="city-input" placeholder="Enter city (e.g., Colombo)" />
+        <button id="fetch-btn">Get Weather</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        const fetchBtn = document.getElementById('fetch-btn');
+        const cityInput = document.getElementById('city-input');
+        const resultDiv = document.getElementById('result');
+
+        fetchBtn.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (!city) {
+                resultDiv.innerHTML = '<p class="error">Please enter a city name.</p>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<p class="loading">Loading...</p>';
+
+            fetch(`/weather/${encodeURIComponent(city)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultDiv.innerHTML = `<p class="error">${data.error}</p>`;
+                        return;
+                    }
+
+                    resultDiv.innerHTML = `
+                        <div class="weather-card">
+                            <h2>${data.city}, ${data.country}</h2>
+                            <p><strong>Temperature:</strong> ${data.temperature_celsius} °C</p>
+                            <p><strong>Feels Like:</strong> ${data.feels_like_celsius} °C</p>
+                            <p><strong>Humidity:</strong> ${data.humidity_percent} %</p>
+                            <p><strong>Weather:</strong> ${data.weather_description}</p>
+                            <p><strong>Wind Speed:</strong> ${data.wind_speed_mps} m/s</p>
+                            <p><strong>Cloud Coverage:</strong> ${data.cloud_coverage_percent} %</p>
+                        </div>
+                    `;
+                })
+                .catch(() => {
+                    resultDiv.innerHTML = '<p class="error">Failed to fetch weather data. Try again later.</p>';
+                });
+        });
+
+        // Optional: Press Enter key triggers fetch
+        cityInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                fetchBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
