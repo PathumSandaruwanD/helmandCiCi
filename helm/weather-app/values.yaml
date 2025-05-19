@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: pathums/weatherapp
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 5001
+  nodePort: 30001
+
+env:
+  WEATHER_API_KEY: ""
